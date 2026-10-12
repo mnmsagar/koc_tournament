@@ -50,6 +50,23 @@ npm run dev:backend
 npm run dev:frontend
 ```
 
+### D. One-Command Docker Compose Setup (Recommended)
+
+Run the entire platform (PostgreSQL, NestJS API, and Next.js Web App with automatic migrations and seed data applied on startup) in a single command:
+```bash
+# Build and launch all 3 containers
+docker compose up --build -d
+
+# View real-time logs across all services
+docker compose logs -f
+
+# Stop all services
+docker compose down
+```
+- **Web App**: [http://localhost:3000](http://localhost:3000)
+- **API Endpoint**: [http://localhost:3001/api/v1](http://localhost:3001/api/v1)
+- **PostgreSQL**: `localhost:5432`
+
 ---
 
 ## 2. Seeded Test Accounts
