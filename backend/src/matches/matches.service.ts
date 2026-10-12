@@ -18,11 +18,8 @@ import {
 } from '../database/schema';
 import { eq, and, sql, or } from 'drizzle-orm';
 
-export interface MoveDto {
-  from: string;
-  to: string;
-  promotion?: string;
-}
+import { MoveDto } from './dto/move.dto';
+export { MoveDto };
 
 @Injectable()
 export class MatchesService {

@@ -15,7 +15,7 @@ A real-time chess tournament and automated matchmaking web platform built with *
    ```env
    PORT=3001
    NODE_ENV=development
-   DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@100.62.114.88:5432/koc?sslmode=require
+   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/koc
    JWT_SECRET=koc_tournament_jwt_super_secret_key_2026_kingdom_of_chess
    JWT_EXPIRES_IN=1d
    FRONTEND_URL=http://localhost:3000

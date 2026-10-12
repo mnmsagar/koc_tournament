@@ -117,6 +117,48 @@ function LoginForm() {
             </button>
           </form>
 
+          {/* Quick Demo Test Accounts (for rapid local evaluation) */}
+          <div className="mt-5 border-t border-slate-100 pt-4">
+            <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 font-headline mb-2 text-center">
+              ⚡ Quick 1-Click Evaluation Accounts
+            </span>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('coach@koc.com');
+                  setPassword('CoachPassword123!');
+                }}
+                className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-orange-50 hover:border-orange-200 p-2 transition text-center"
+              >
+                <span className="text-[11px] font-bold text-[#0c2340] font-headline">Coach</span>
+                <span className="text-[9px] text-slate-500 font-mono">Fischer</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('alice@koc.com');
+                  setPassword('StudentPassword123!');
+                }}
+                className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-orange-50 hover:border-orange-200 p-2 transition text-center"
+              >
+                <span className="text-[11px] font-bold text-[#0c2340] font-headline">Alice</span>
+                <span className="text-[9px] text-slate-500 font-mono">Student</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('bob@koc.com');
+                  setPassword('StudentPassword123!');
+                }}
+                className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50 hover:bg-orange-50 hover:border-orange-200 p-2 transition text-center"
+              >
+                <span className="text-[11px] font-bold text-[#0c2340] font-headline">Bob</span>
+                <span className="text-[9px] text-slate-500 font-mono">Student</span>
+              </button>
+            </div>
+          </div>
+
           {/* Switch to Sign Up */}
           <div className="mt-5 text-center border-t border-slate-100 pt-4">
             <p className="text-xs text-slate-600 font-body">

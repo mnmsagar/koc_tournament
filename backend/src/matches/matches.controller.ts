@@ -6,7 +6,8 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
-import { MatchesService, MoveDto } from './matches.service';
+import { MatchesService } from './matches.service';
+import { MoveDto } from './dto/move.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser, JwtPayload } from '../common/decorators/current-user.decorator';
 
