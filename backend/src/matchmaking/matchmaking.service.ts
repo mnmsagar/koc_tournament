@@ -18,6 +18,25 @@ export class MatchmakingService {
   constructor(private readonly dbService: DatabaseService) {}
 
   async addToQueue(tournamentId: string, userId: string, socketId?: string) {
+    // 0. Verify tournament exists and has started
+    const tournQuery = await this.dbService.db
+      .select()
+      .from(tournaments)
+      .where(eq(tournaments.id, tournamentId));
+
+    if (tournQuery.length === 0) {
+      throw new BadRequestException('Tournament not found');
+    }
+
+    const tourn = tournQuery[0];
+    if (tourn.status === 'completed') {
+      throw new BadRequestException('This tournament has concluded');
+    }
+
+    if (tourn.startDate && new Date(tourn.startDate).getTime() > Date.now()) {
+      throw new BadRequestException('This tournament has not started yet. Matchmaking opens at scheduled start time.');
+    }
+
     // 1. Verify user is registered in the tournament
     const participant = await this.dbService.db
       .select()

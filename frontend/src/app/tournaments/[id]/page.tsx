@@ -256,7 +256,26 @@ function TournamentDetailContent() {
     return () => clearInterval(timer);
   }, [isQueuing]);
 
+  const isCompleted = tournament?.status === 'completed';
+  const isUpcoming = React.useMemo(() => {
+    if (!tournament?.startDate) return false;
+    try {
+      const start = new Date(tournament.startDate);
+      return !isNaN(start.getTime()) && start.getTime() > Date.now();
+    } catch {
+      return false;
+    }
+  }, [tournament?.startDate]);
+
   const handleStartQueue = () => {
+    if (isUpcoming) {
+      setErrorMessage('Tournament has not started yet. Matchmaking opens at scheduled start time.');
+      return;
+    }
+    if (isCompleted) {
+      setErrorMessage('This tournament has already concluded.');
+      return;
+    }
     setErrorMessage(null);
     const socket = getSocket();
     setIsQueuing(true);
@@ -1183,8 +1202,22 @@ function TournamentDetailContent() {
                   </div>
                 </div>
                 <div className="h-8 w-px bg-slate-200 hidden sm:block" />
-                <span className="px-3.5 py-1.5 rounded-lg bg-[#0c2340] text-white font-mono text-xs font-bold tracking-wide shadow-sm">
-                  Round Active
+                <span className={`px-3.5 py-1.5 rounded-lg font-mono text-xs font-bold tracking-wide shadow-sm ${
+                  isCompleted
+                    ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                    : isUpcoming
+                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                      : tournament.status === 'ongoing'
+                        ? 'bg-[#ea580c] text-white animate-pulse'
+                        : 'bg-[#0c2340] text-white'
+                }`}>
+                  {isCompleted
+                    ? 'Event Concluded'
+                    : isUpcoming
+                      ? 'Scheduled Event'
+                      : tournament.status === 'ongoing'
+                        ? 'Live Round Active'
+                        : 'Open for Play'}
                 </span>
               </div>
             </div>
@@ -1249,7 +1282,9 @@ function TournamentDetailContent() {
                         Join this tournament to compete
                       </h3>
                       <p className="text-xs text-slate-600 mt-0.5">
-                        Register now to unlock automated FIFO matchmaking and earn points on the live leaderboard.
+                        {isUpcoming
+                          ? 'Pre-register now to confirm your tournament slot before matches begin.'
+                          : 'Register now to unlock automated FIFO matchmaking and earn points on the live leaderboard.'}
                       </p>
                     </div>
                     <button
@@ -1275,6 +1310,63 @@ function TournamentDetailContent() {
                         </>
                       )}
                     </button>
+                  </div>
+                ) : isCompleted ? (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-purple-50/70 border border-purple-200">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-700 shrink-0">
+                        <Trophy className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <span className="font-headline text-xs font-bold text-purple-700 uppercase tracking-wider block">
+                          Tournament Concluded
+                        </span>
+                        <h3 className="font-headline text-base sm:text-lg font-bold text-[#0c2340] mt-0.5">
+                          Event Has Ended
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          All rounds have concluded. Check the final leaderboard standings and match history below.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setActiveTab('leaderboard')}
+                      className="rounded-xl border border-purple-200 bg-white hover:bg-purple-50 px-5 py-2.5 text-xs font-bold text-purple-700 font-headline transition shadow-2xs shrink-0"
+                    >
+                      View Final Standings
+                    </button>
+                  </div>
+                ) : isUpcoming ? (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-amber-50/70 border border-amber-200 shadow-2xs">
+                    <div className="flex items-start sm:items-center gap-3.5">
+                      <div className="h-11 w-11 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 shrink-0 shadow-2xs">
+                        <Clock className="h-5 w-5 text-amber-700" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-headline text-xs font-extrabold text-emerald-700 bg-emerald-100/80 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                            Registration Confirmed
+                          </span>
+                          <span className="text-[11px] font-bold text-amber-700 font-headline uppercase tracking-wider">
+                            Upcoming Event
+                          </span>
+                        </div>
+                        <h3 className="font-headline text-base sm:text-lg font-extrabold text-[#0c2340] mt-1">
+                          Tournament Starts on {formatTournamentSchedule(tournament.startDate, tournament.endDate)}
+                        </h3>
+                        <p className="text-xs text-slate-600 mt-0.5 font-body">
+                          You are enrolled! Automated matchmaking (&ldquo;Find Opponent&rdquo;) will automatically open once the tournament begins at the scheduled start time.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-stretch sm:self-auto justify-end">
+                      <span className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white border border-amber-300/80 text-amber-800 text-xs font-bold font-headline shadow-2xs">
+                        <Timer className="h-3.5 w-3.5 text-[#ea580c]" />
+                        Clock: {tournament.timeControl} Rapid
+                      </span>
+                    </div>
                   </div>
                 ) : isQueuing ? (
                   <div className="rounded-xl bg-slate-50 border border-slate-200 p-5 sm:p-6 flex flex-col md:flex-row items-center gap-5 sm:gap-6 relative overflow-hidden">
