@@ -18,8 +18,6 @@ import {
   Loader2,
   Flame,
   CheckCircle2,
-  ChevronRight,
-  ChevronLeft,
   ChevronDown,
   Search,
   Check,
@@ -42,7 +40,6 @@ function StandingsContent() {
   const [selectedTournamentId, setSelectedTournamentId] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownSearch, setDropdownSearch] = useState('');
-  const sliderRef = React.useRef<HTMLDivElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,20 +48,23 @@ function StandingsContent() {
         setIsDropdownOpen(false);
       }
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsDropdownOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
-
-  const scrollTrack = (direction: 'left' | 'right') => {
-    if (sliderRef.current) {
-      const scrollAmount = direction === 'left' ? -280 : 280;
-      sliderRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
 
   const handleSelectTournament = (id: string) => {
     setSelectedTournamentId(id);
     setIsDropdownOpen(false);
+    setDropdownSearch('');
   };
 
   useEffect(() => {
@@ -147,40 +147,66 @@ function StandingsContent() {
         )}
       </div>
 
-      {/* Tournament Selection: Horizontal Slider with Left/Right Navigation & Dropdown */}
-      <div className="mb-8 koc-card rounded-2xl p-3.5 sm:p-4 border border-slate-200 bg-white shadow-2xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 font-headline">
-              Select Tournament Arena
-            </span>
-            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px] font-bold">
-              {tournaments?.length || 0} Arenas Available
-            </span>
-          </div>
-
-          {/* Quick Dropdown Trigger */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-full sm:w-auto flex items-center justify-between gap-2.5 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[#0c2340] text-xs font-bold transition font-headline shadow-2xs"
-            >
-              <div className="flex items-center gap-1.5 truncate max-w-[220px]">
-                <Trophy className="h-3.5 w-3.5 text-[#ea580c] shrink-0" />
-                <span className="truncate">
-                  {selectedTournament ? selectedTournament.name : 'Choose Arena...'}
+      {/* Tournament Selection: Searchable Arena Dropdown */}
+      <div className="mb-8 koc-card rounded-2xl p-4 sm:p-5 border border-slate-200 bg-white shadow-2xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-[#ea580c] shrink-0">
+              <Trophy className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 font-headline">
+                  Tournament Arena
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px] font-bold">
+                  {tournaments?.length || 0} Arenas Available
                 </span>
               </div>
+              <span className="text-xs text-slate-600 font-body">
+                Select an arena to view official standings, player points, and match records
+              </span>
+            </div>
+          </div>
+
+          {/* Searchable Dropdown Trigger & Popover */}
+          <div className="relative w-full sm:w-auto min-w-[280px] sm:min-w-[340px]" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[#0c2340] text-xs sm:text-sm font-bold transition font-headline shadow-2xs hover:border-[#ea580c]/50 focus:outline-none focus:ring-2 focus:ring-[#ea580c]/20"
+            >
+              <div className="flex items-center gap-2 truncate">
+                {selectedTournament && (
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full shrink-0 ${
+                      selectedTournament.status === 'open'
+                        ? 'bg-emerald-500 animate-pulse'
+                        : selectedTournament.status === 'ongoing'
+                          ? 'bg-amber-500 animate-pulse'
+                          : 'bg-slate-300'
+                    }`}
+                  />
+                )}
+                <span className="truncate text-slate-900 font-extrabold">
+                  {selectedTournament ? selectedTournament.name : 'Choose Arena...'}
+                </span>
+                {selectedTournament && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-md font-mono font-semibold bg-white border border-slate-200 text-slate-600 shrink-0">
+                    {selectedTournament.timeControl}
+                  </span>
+                )}
+              </div>
               <ChevronDown
-                className={`h-3.5 w-3.5 text-slate-400 transition-transform ${
+                className={`h-4 w-4 text-slate-400 shrink-0 transition-transform duration-200 ${
                   isDropdownOpen ? 'rotate-180 text-[#ea580c]' : ''
                 }`}
               />
             </button>
 
-            {/* Dropdown Menu */}
+            {/* Dropdown Menu Popover */}
             {isDropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 max-h-80 overflow-y-auto bg-white rounded-2xl border border-slate-200 shadow-xl z-50 p-2 divide-y divide-slate-100 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute right-0 top-full mt-2 w-full sm:w-96 max-h-84 overflow-y-auto bg-white rounded-2xl border border-slate-200 shadow-xl z-50 p-2 divide-y divide-slate-100 animate-in fade-in zoom-in-95 duration-100">
                 <div className="p-1.5 pb-2">
                   <div className="relative">
                     <Search className="h-3.5 w-3.5 text-slate-400 absolute left-2.5 top-2.5" />
@@ -189,44 +215,60 @@ function StandingsContent() {
                       placeholder="Search arenas by name or time..."
                       value={dropdownSearch}
                       onChange={(e) => setDropdownSearch(e.target.value)}
-                      className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:border-[#ea580c]"
+                      className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:border-[#ea580c] focus:bg-white transition"
+                      autoFocus
                     />
                   </div>
                 </div>
                 <div className="pt-1 space-y-1">
-                  {filteredTournaments.map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => handleSelectTournament(t.id)}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs font-headline transition ${
-                        selectedTournamentId === t.id
-                          ? 'bg-orange-50 text-[#ea580c] font-bold'
-                          : 'hover:bg-slate-50 text-[#0c2340]'
-                      }`}
-                    >
-                      <div className="min-w-0 pr-2">
-                        <span className="truncate block font-semibold">{t.name}</span>
-                        <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono font-normal mt-0.5">
-                          <span>{t.timeControl}</span>
-                          <span>•</span>
-                          <span
-                            className={`uppercase text-[9px] font-bold px-1.5 py-0.2 rounded font-headline ${
-                              t.status === 'open'
-                                ? 'bg-emerald-50 text-emerald-600'
-                                : t.status === 'ongoing'
-                                  ? 'bg-amber-50 text-amber-600'
-                                  : 'bg-slate-100 text-slate-500'
-                            }`}
-                          >
-                            {t.status}
-                          </span>
+                  {filteredTournaments.map((t) => {
+                    const isSelected = selectedTournamentId === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => handleSelectTournament(t.id)}
+                        className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs font-headline transition ${
+                          isSelected
+                            ? 'bg-orange-50 text-[#ea580c] font-bold ring-1 ring-[#ea580c]/30'
+                            : 'hover:bg-slate-50 text-[#0c2340]'
+                        }`}
+                      >
+                        <div className="min-w-0 pr-2">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`h-2 w-2 rounded-full shrink-0 ${
+                                t.status === 'open'
+                                  ? 'bg-emerald-500'
+                                  : t.status === 'ongoing'
+                                    ? 'bg-amber-500'
+                                    : 'bg-slate-300'
+                              }`}
+                            />
+                            <span className="truncate block font-semibold text-slate-800">{t.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono mt-0.5 pl-3.5">
+                            <span>{t.timeControl}</span>
+                            <span>•</span>
+                            <span
+                              className={`uppercase text-[9px] font-bold px-1.5 py-0.2 rounded font-headline ${
+                                t.status === 'open'
+                                  ? 'bg-emerald-50 text-emerald-600'
+                                  : t.status === 'ongoing'
+                                    ? 'bg-amber-50 text-amber-600'
+                                    : 'bg-slate-100 text-slate-500'
+                              }`}
+                            >
+                              {t.status}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      {selectedTournamentId === t.id && (
-                        <Check className="h-4 w-4 text-[#ea580c] shrink-0" />
-                      )}
-                    </button>
-                  ))}
+                        {isSelected && (
+                          <Check className="h-4 w-4 text-[#ea580c] shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
                   {filteredTournaments.length === 0 && (
                     <div className="p-4 text-center text-xs text-slate-400 font-body">
                       No matching tournaments found.
@@ -236,69 +278,6 @@ function StandingsContent() {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Horizontal Slider Track with Arrows */}
-        <div className="relative flex items-center gap-2">
-          {/* Left Arrow Button */}
-          <button
-            onClick={() => scrollTrack('left')}
-            className="hidden sm:flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 shadow-2xs shrink-0 transition hover:border-[#ea580c] hover:text-[#ea580c]"
-            title="Scroll Left"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-
-          {/* Slider Container Track */}
-          <div
-            ref={sliderRef}
-            className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5 flex-1"
-          >
-            {tournaments?.map((t) => {
-              const isSelected = selectedTournamentId === t.id;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setSelectedTournamentId(t.id)}
-                  className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition font-headline shrink-0 whitespace-nowrap shadow-2xs ${
-                    isSelected
-                      ? 'bg-[#0c2340] text-white ring-2 ring-[#ea580c] shadow-sm'
-                      : 'bg-slate-50 border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-white'
-                  }`}
-                >
-                  {/* Status Indicator Dot */}
-                  <span
-                    className={`h-2 w-2 rounded-full shrink-0 ${
-                      t.status === 'open'
-                        ? 'bg-emerald-500 animate-pulse'
-                        : t.status === 'ongoing'
-                          ? 'bg-amber-500 animate-pulse'
-                          : 'bg-slate-300'
-                    }`}
-                  />
-                  <span>{t.name}</span>
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-semibold ${
-                      isSelected
-                        ? 'bg-[#ea580c] text-white'
-                        : 'bg-white border border-slate-200 text-slate-600'
-                    }`}
-                  >
-                    {t.timeControl}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Right Arrow Button */}
-          <button
-            onClick={() => scrollTrack('right')}
-            className="hidden sm:flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 shadow-2xs shrink-0 transition hover:border-[#ea580c] hover:text-[#ea580c]"
-            title="Scroll Right"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
         </div>
       </div>
 
