@@ -392,7 +392,7 @@ function MatchPageContent() {
                   {opponent?.name || 'Opponent'}
                 </div>
                 <div className="text-[10px] text-slate-400 font-mono leading-none">
-                  {isWhite ? 'Black (1615 Elo)' : 'White (1615 Elo)'}
+                  {isWhite ? 'Black' : 'White'}
                 </div>
               </div>
             </div>
@@ -500,7 +500,7 @@ function MatchPageContent() {
                   </span>
                 </div>
                 <div className="text-[10px] text-slate-400 font-mono leading-none">
-                  {isWhite ? 'White (1640 Elo)' : 'Black (1640 Elo)'}
+                  {isWhite ? 'White' : 'Black'}
                 </div>
               </div>
             </div>

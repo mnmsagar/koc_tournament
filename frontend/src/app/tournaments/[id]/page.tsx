@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../context/AuthContext';
 import { apiRequest } from '../../../lib/api';
 import { getSocket } from '../../../lib/socket';
-import { TournamentLeaderboardResponse } from '../../../types';
+import { TournamentLeaderboardResponse, UserStats, StudentStats } from '../../../types';
 import {
   Trophy,
   Swords,
@@ -128,6 +128,31 @@ function TournamentDetailContent() {
     queryFn: () => apiRequest<TournamentLeaderboardResponse>(`/tournaments/${id}/leaderboard`),
     refetchInterval: 5000,
   });
+
+  // Fetch user stats for dynamic profile telemetry (rating, streak, candidate title)
+  const { data: userStats } = useQuery<UserStats>({
+    queryKey: ['user-stats'],
+    queryFn: () => apiRequest<UserStats>('/me/stats'),
+    enabled: !!user,
+  });
+
+  const studentStats =
+    userStats && userStats.role === 'student' ? (userStats as StudentStats) : undefined;
+
+  const initials = React.useMemo(() => {
+    if (!user?.name) return 'KC';
+    const parts = user.name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }, [user?.name]);
+
+  const avatarSrc = React.useMemo(() => {
+    if (user?.role === 'coach') return '/avatars/coach.png';
+    const lower = user?.name?.toLowerCase() || '';
+    if (lower.includes('alex')) return '/avatars/alex.png';
+    if (lower.includes('marcus')) return '/avatars/marcus.png';
+    return null;
+  }, [user?.role, user?.name]);
 
   // Join Tournament mutation
   const joinMutation = useMutation({
@@ -1035,12 +1060,18 @@ function TournamentDetailContent() {
           {/* Identity Info with Official Student Avatar */}
           <div className="flex items-center gap-4 sm:gap-5">
             <div className="relative shrink-0">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-50 border-2 border-orange-200 overflow-hidden shadow-sm flex items-center justify-center">
-                <img
-                  alt={user?.name || 'Competitor'}
-                  className="w-full h-full object-cover"
-                  src="/avatars/alex.png"
-                />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#0c2340] to-slate-800 border-2 border-orange-200 overflow-hidden shadow-sm flex items-center justify-center text-white">
+                {avatarSrc ? (
+                  <img
+                    alt={user?.name || 'Competitor'}
+                    className="w-full h-full object-cover"
+                    src={avatarSrc}
+                  />
+                ) : (
+                  <span className="font-headline text-lg sm:text-2xl font-black text-amber-300 tracking-wider">
+                    {initials}
+                  </span>
+                )}
               </div>
               <span className="absolute -bottom-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-emerald-200">
                 <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-500 animate-pulse" />
@@ -1052,16 +1083,16 @@ function TournamentDetailContent() {
                 <h1 className="font-headline text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0c2340] tracking-tight truncate">
                   {user?.name || 'Competitor'}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] sm:text-xs font-bold font-headline flex items-center gap-1">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] sm:text-xs font-bold font-headline flex items-center gap-1 shadow-2xs">
                   <Crown className="h-3.5 w-3.5 text-amber-500" />
-                  Gold Candidate
+                  {studentStats?.title || 'Scholastic Candidate'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 flex flex-wrap items-center gap-2 mt-1">
                 <span className="font-medium text-slate-700">National Scholastic Circuit</span>
                 <span className="text-slate-300">•</span>
                 <span className="font-mono text-xs text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded">
-                  ID: #KC-9821-BLZ
+                  ID: #{user?.id ? `KC-${user.id.slice(0, 8).toUpperCase()}` : 'KC-SCHOLAR'}
                 </span>
                 <span className="text-slate-300">•</span>
                 <span className="text-xs text-[#f97316] font-semibold">Kingdom of Chess Academy</span>
@@ -1072,42 +1103,45 @@ function TournamentDetailContent() {
           {/* Stats Strip */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full lg:w-auto">
             {/* Rating Card */}
-            <div className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col min-w-[120px]">
+            <div className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col min-w-[130px]">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider font-headline">
                 Rating (Blitz)
               </span>
               <div className="flex items-baseline gap-1.5 sm:gap-2 mt-0.5">
-                <span className="font-mono text-xl sm:text-2xl font-bold text-[#0c2340]">1640</span>
-                <span className="font-mono text-[11px] sm:text-xs font-bold text-emerald-600 bg-emerald-100/70 px-1.5 py-0.5 rounded">
-                  +18 today
+                <span className="font-mono text-xl sm:text-2xl font-bold text-[#0c2340]">
+                  {studentStats?.rating ?? 1200}
+                </span>
+                <span
+                  className={`font-mono text-[11px] sm:text-xs font-bold px-1.5 py-0.5 rounded ${
+                    (studentStats?.ratingNet ?? 0) > 0
+                      ? 'text-emerald-700 bg-emerald-100/80 border border-emerald-200/60'
+                      : (studentStats?.ratingNet ?? 0) < 0
+                        ? 'text-red-700 bg-red-100/80 border border-red-200/60'
+                        : 'text-slate-500 bg-slate-200/60'
+                  }`}
+                >
+                  {studentStats?.completedGames
+                    ? studentStats.ratingNet > 0
+                      ? `+${studentStats.ratingNet} pts`
+                      : studentStats.ratingNet < 0
+                        ? `${studentStats.ratingNet} pts`
+                        : 'Even'
+                    : 'Provisional'}
                 </span>
               </div>
             </div>
 
             {/* Streak Card */}
-            <div className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col min-w-[110px]">
+            <div className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col min-w-[120px]">
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider font-headline">
                 Active Streak
               </span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Flame className="h-5 w-5 text-[#f97316]" />
                 <span className="font-headline text-lg sm:text-xl font-extrabold text-[#0c2340]">
-                  3 Wins
-                </span>
-              </div>
-            </div>
-
-            {/* Socket.IO Gateway Latency */}
-            <div className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                <Radio className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-headline text-xs font-bold text-[#0c2340]">
-                  Socket.IO Gateway
-                </span>
-                <span className="font-mono text-[11px] font-semibold text-emerald-600">
-                  34ms latency • Synced
+                  {studentStats?.streak
+                    ? `${studentStats.streak} Win${studentStats.streak > 1 ? 's' : ''}`
+                    : '0 Wins'}
                 </span>
               </div>
             </div>
