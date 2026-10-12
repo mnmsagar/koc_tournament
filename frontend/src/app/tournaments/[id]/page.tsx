@@ -1035,7 +1035,7 @@ function TournamentDetailContent() {
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
                   <span className="font-medium text-slate-600">Pairing Algorithm</span>
-                  <span className="font-mono font-bold text-[#0c2340]">FIFO + Elo Window ±150</span>
+                  <span className="font-bold text-[#0c2340]">Balanced Skill Matching (±150 Elo)</span>
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
                   <span className="font-medium text-slate-600">Arbiter Jurisdiction</span>
@@ -1284,7 +1284,7 @@ function TournamentDetailContent() {
                       <p className="text-xs text-slate-600 mt-0.5">
                         {isUpcoming
                           ? 'Pre-register now to confirm your tournament slot before matches begin.'
-                          : 'Register now to unlock automated FIFO matchmaking and earn points on the live leaderboard.'}
+                          : 'Register now to play live matches, earn points, and climb the leaderboard.'}
                       </p>
                     </div>
                     <button
@@ -1400,10 +1400,10 @@ function TournamentDetailContent() {
                         <div>
                           <span className="font-headline text-xs font-bold text-[#f97316] uppercase tracking-wider flex items-center justify-center md:justify-start gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-[#f97316] animate-ping" />
-                            Live Queue Active
+                            Looking for a Match
                           </span>
                           <h3 className="font-headline text-lg sm:text-xl font-extrabold text-[#0c2340]">
-                            Searching for Opponent...
+                            Finding Your Next Opponent...
                           </h3>
                         </div>
 
@@ -1411,7 +1411,7 @@ function TournamentDetailContent() {
                         <div className="flex items-center justify-center md:justify-end gap-5">
                           <div className="text-right">
                             <div className="text-[10px] font-bold text-slate-400 font-headline uppercase">
-                              Elapsed
+                              Time Waiting
                             </div>
                             <div className="font-mono text-base sm:text-lg font-bold text-[#0c2340]">
                               {formatTimer(queueElapsed)}
@@ -1422,38 +1422,39 @@ function TournamentDetailContent() {
                               Est. Wait
                             </div>
                             <div className="font-mono text-base sm:text-lg font-bold text-[#f97316]">
-                              ~00:35
+                              ~30 sec
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Constraints Pills */}
+                      {/* User-friendly Match Info Pills */}
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 pt-1">
-                        <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-mono text-[11px] font-medium shadow-2xs">
-                          Band: ±150 Elo (1490 - 1790)
+                        <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 font-headline text-[11px] font-semibold shadow-2xs">
+                          🎯 Fair Skill Matchup
                         </span>
-                        <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-mono text-[11px] font-medium shadow-2xs">
-                          Colors: Balanced Random
+                        <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 font-headline text-[11px] font-semibold shadow-2xs">
+                          ♟️ Random Colors (White / Black)
                         </span>
-                        <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-mono text-[11px] font-medium shadow-2xs">
-                          Round Rule: 1 Game Limit
+                        <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 font-headline text-[11px] font-semibold shadow-2xs">
+                          ⏱️ {tournament.timeControl} Rapid Clock
                         </span>
-                        <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-mono text-[11px] font-medium shadow-2xs">
-                          Queue: Strict FIFO
+                        <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 font-headline text-[11px] font-semibold shadow-2xs">
+                          ⚡ Instant Pairings
                         </span>
                       </div>
 
                       {/* Controls */}
                       <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                         <button
+                          id="btn-cancel-search"
                           onClick={handleCancelQueue}
-                          className="w-full sm:w-auto px-4 py-2 rounded-lg bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 font-headline font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
+                          className="w-full sm:w-auto px-4 py-2 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 font-headline font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
                         >
-                          <XCircle className="h-4 w-4" /> Cancel Queue
+                          <XCircle className="h-4 w-4" /> Cancel Search
                         </button>
                         <span className="text-xs font-medium text-slate-500 hidden sm:inline">
-                          Pairing automatically in database transaction
+                          Your chess board will open automatically as soon as an opponent is found.
                         </span>
                       </div>
                     </div>
@@ -1469,12 +1470,13 @@ function TournamentDetailContent() {
                         Ready to Play Your Match?
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Click below to enter the automated matchmaking pool. You will be paired with the next available competitor.
+                        Click below to start playing. You will be automatically paired with the next available player.
                       </p>
                     </div>
                     <button
+                      id="btn-find-opponent"
                       onClick={handleStartQueue}
-                      className="koc-btn-primary px-6 py-3.5 text-sm font-bold flex items-center gap-2 shrink-0"
+                      className="koc-btn-primary px-6 py-3.5 text-sm font-bold flex items-center gap-2 shrink-0 cursor-pointer"
                     >
                       <Swords className="h-4 w-4" />
                       Find Opponent Now

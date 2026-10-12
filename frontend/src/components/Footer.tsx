@@ -64,7 +64,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-1.5">
                 <Swords className="h-3.5 w-3.5 text-[#14b8a6]" />
-                Atomic FIFO Matchmaking
+                Instant Fair Matchmaking
               </li>
               <li className="flex items-center gap-1.5">
                 <Trophy className="h-3.5 w-3.5 text-amber-400" />

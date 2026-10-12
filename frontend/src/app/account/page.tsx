@@ -384,12 +384,12 @@ export default function AccountPage() {
             <div className="mt-5 rounded-2xl border border-orange-200 bg-orange-50/70 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="font-headline font-bold text-xs text-[#0c2340] block">
-                  {isCoach ? 'Tournament Director Console' : 'Automated FIFO Matchmaking Status'}
+                  {isCoach ? 'Tournament Director Console' : 'Live Matchmaking Status'}
                 </span>
                 <span className="text-[11px] text-slate-600 mt-0.5 block font-body">
                   {isCoach
                     ? 'Create scholastic events, set time controls, and supervise live rounds.'
-                    : `Current rating ${studentStats?.rating ?? 1200}. Eligible for rapid rounds with ±150 rating bandwidth.`}
+                    : `Current rating ${studentStats?.rating ?? 1200}. Matched fairly with opponents near your skill level.`}
                 </span>
               </div>
               <Link

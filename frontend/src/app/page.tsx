@@ -307,13 +307,13 @@ export default function HomePage() {
                 <Swords className="h-6 w-6" />
               </div>
               <h3 className="text-lg font-bold text-[#0c2340] font-headline">
-                Automated Matchmaking Radar
+                Instant Matchmaking Radar
               </h3>
               <p className="mt-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed font-body">
-                Players queue into a concurrency-safe FIFO matchmaking pool. Both competitors are atomically paired and redirected to the live board without manual refreshes.
+                Find matched opponents in seconds. Players are paired fairly and redirected automatically to their live chess board without manual refreshes.
               </p>
               <div className="mt-5 flex items-center gap-1.5 text-xs font-bold text-[#ea580c]">
-                <Zap className="h-4 w-4" /> Zero duplicate pairings
+                <Zap className="h-4 w-4" /> Fair & instant pairings
               </div>
             </div>
 

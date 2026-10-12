@@ -197,8 +197,8 @@ export default function ActiveMatchPage() {
 
         <p className="mx-auto mt-2.5 max-w-lg text-xs sm:text-sm text-slate-500 font-body leading-relaxed">
           {user?.role === 'coach'
-            ? 'As an Academy Coach, you organize tournaments and supervise matches. Visit the Tournament Directory to start rounds, inspect student rosters, or spectate live games.'
-            : 'You are not currently paired in an ongoing game. To begin playing, join an active scholastic tournament round and queue up via the automated matchmaking radar.'}
+            ? 'As an Academy Coach, you organize tournaments and supervise matches. Visit the Tournament Director Hub to start rounds, inspect student rosters, or spectate live games.'
+            : 'You are not currently playing a match. To begin playing, join an active scholastic tournament and find your next opponent.'}
         </p>
 
         {/* Primary Action Buttons */}
@@ -218,7 +218,7 @@ export default function ActiveMatchPage() {
               className="koc-btn-primary w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl py-3 px-6 text-xs sm:text-sm font-bold font-headline shadow-sm"
             >
               <Zap className="h-4 w-4" />
-              Queue in {openTournament.name}
+              Find Opponent in {openTournament.name}
               <ArrowRight className="h-4 w-4" />
             </Link>
           ) : (
@@ -246,30 +246,30 @@ export default function ActiveMatchPage() {
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex items-center gap-2 mb-1">
               <Zap className="h-4 w-4 text-[#ea580c]" />
-              <span className="font-headline font-bold text-xs text-[#0c2340]">Strict FIFO</span>
+              <span className="font-headline font-bold text-xs text-[#0c2340]">Instant Pairings</span>
             </div>
             <p className="text-[11px] text-slate-500 font-body leading-normal">
-              Players are paired in order of queue arrival with zero duplicate pairings.
+              Players are paired quickly in order of joining with no duplicate opponents.
             </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex items-center gap-2 mb-1">
               <Timer className="h-4 w-4 text-emerald-600" />
-              <span className="font-headline font-bold text-xs text-[#0c2340]">FIDE Clocks</span>
+              <span className="font-headline font-bold text-xs text-[#0c2340]">Official Clocks</span>
             </div>
             <p className="text-[11px] text-slate-500 font-body leading-normal">
-              Digital clocks sync on the backend with authoritative flag-fall timeout adjudication.
+              Live tournament chess clocks with automatic time-out detection.
             </p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex items-center gap-2 mb-1">
               <Shield className="h-4 w-4 text-blue-600" />
-              <span className="font-headline font-bold text-xs text-[#0c2340]">Rating Band</span>
+              <span className="font-headline font-bold text-xs text-[#0c2340]">Fair Skill Matchup</span>
             </div>
             <p className="text-[11px] text-slate-500 font-body leading-normal">
-              Automated ±150 Elo skill rating matching for balanced scholastic games.
+              Smart rating matching ensures balanced games with players at your skill level.
             </p>
           </div>
         </div>
