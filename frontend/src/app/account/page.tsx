@@ -11,17 +11,12 @@ import {
   Crown,
   Trophy,
   Swords,
-  Shield,
-  LogOut,
   Mail,
-  Calendar,
-  Lock,
   ArrowRight,
   Flame,
   CheckCircle2,
   Medal,
   Activity,
-  Layers,
   Sparkles,
   Users,
   Clock,
@@ -31,7 +26,7 @@ import {
 
 export default function AccountPage() {
   const router = useRouter();
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
 
   // Fetch 100% dynamic user stats from backend
   const { data: stats, isLoading: statsLoading } = useQuery<UserStats>({
@@ -39,11 +34,6 @@ export default function AccountPage() {
     queryFn: () => apiRequest<UserStats>('/me/stats'),
     enabled: !!user,
   });
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/login');
-  };
 
   const isCoach = user?.role === 'coach';
   const coachStats = isCoach ? (stats as CoachStats | undefined) : undefined;
@@ -97,26 +87,19 @@ export default function AccountPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:py-10 pb-24 md:pb-12">
       {/* Top Breadcrumb / Title */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 text-[#ea580c] mb-1">
-            <Crown className="h-4 w-4" />
-            <span className="text-xs font-extrabold uppercase tracking-widest font-headline">
-              Kingdom of Chess Profile
-            </span>
-          </div>
-          <h1 className="font-headline text-2xl sm:text-4xl font-extrabold tracking-tight text-[#0c2340]">
-            Account & Player Hub
-          </h1>
+      <div className="mb-6 border-b border-slate-200 pb-5">
+        <div className="flex items-center gap-2 text-[#ea580c] mb-1">
+          <Crown className="h-4 w-4" />
+          <span className="text-xs font-extrabold uppercase tracking-widest font-headline">
+            Kingdom of Chess Profile
+          </span>
         </div>
-
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 px-3.5 py-2 text-xs font-bold text-red-600 transition font-headline shadow-2xs"
-        >
-          <LogOut className="h-4 w-4" />
-          <span className="hidden sm:inline">Sign Out</span>
-        </button>
+        <h1 className="font-headline text-2xl sm:text-4xl font-extrabold tracking-tight text-[#0c2340]">
+          Account & Player Hub
+        </h1>
+        <p className="mt-1 text-xs sm:text-sm text-slate-600 font-body">
+          Personal ratings, match statistics, and tournament history across the academy league.
+        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-12">
@@ -535,55 +518,6 @@ export default function AccountPage() {
                 </div>
               )
             )}
-          </div>
-
-          {/* Security & Session Info */}
-          <div className="koc-card rounded-3xl p-6 sm:p-7 border border-slate-200 bg-white shadow-sm">
-            <h3 className="font-headline text-lg font-bold text-[#0c2340] flex items-center gap-2 mb-4">
-              <Shield className="h-5 w-5 text-emerald-600" />
-              Security & Session Details
-            </h3>
-
-            <div className="space-y-3 text-xs font-body">
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
-                <div className="flex items-center gap-2.5">
-                  <Lock className="h-4 w-4 text-slate-400" />
-                  <div>
-                    <span className="font-bold text-[#0c2340] block">Password Authentication</span>
-                    <span className="text-slate-500 text-[11px]">Bcrypt Salted & Encrypted</span>
-                  </div>
-                </div>
-                <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 font-mono text-[10px] font-bold text-emerald-600">
-                  Active
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
-                <div className="flex items-center gap-2.5">
-                  <Layers className="h-4 w-4 text-slate-400" />
-                  <div>
-                    <span className="font-bold text-[#0c2340] block">HttpOnly Cookie Token</span>
-                    <span className="text-slate-500 text-[11px]">Protected from XSS / Client-side theft</span>
-                  </div>
-                </div>
-                <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 font-mono text-[10px] font-bold text-emerald-600">
-                  Secure
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
-                <div className="flex items-center gap-2.5">
-                  <Calendar className="h-4 w-4 text-slate-400" />
-                  <div>
-                    <span className="font-bold text-[#0c2340] block">Real-Time Sync Protocol</span>
-                    <span className="text-slate-500 text-[11px]">Socket.IO 2-Way WebSocket Rooms</span>
-                  </div>
-                </div>
-                <span className="px-2.5 py-1 rounded-md bg-white border border-slate-200 font-mono text-[10px] font-bold text-emerald-600">
-                  Connected
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
