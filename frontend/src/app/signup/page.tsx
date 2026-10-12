@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import {
   Crown,
@@ -17,8 +17,10 @@ import {
   Loader2,
 } from 'lucide-react';
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect') || '/tournaments';
   const { user, loading, register } = useAuth();
 
   const [name, setName] = useState('');
@@ -31,9 +33,9 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace('/tournaments');
+      router.replace(redirectTarget);
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, redirectTarget]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +54,7 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       await register(name.trim(), email.trim(), password, role);
-      router.push('/tournaments');
+      router.push(redirectTarget);
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -224,7 +226,11 @@ export default function SignupPage() {
             <p className="text-xs text-slate-600 font-body">
               Already have an account?{' '}
               <Link
-                href="/login"
+                href={
+                  redirectTarget !== '/tournaments'
+                    ? `/login?redirect=${encodeURIComponent(redirectTarget)}`
+                    : '/login'
+                }
                 className="font-bold text-[#ea580c] hover:underline font-headline"
               >
                 Sign In here
@@ -234,5 +240,19 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[calc(100vh-5rem)] items-center justify-center p-4">
+          <Loader2 className="h-8 w-8 animate-spin text-[#ea580c]" />
+        </div>
+      }
+    >
+      <SignupForm />
+    </Suspense>
   );
 }

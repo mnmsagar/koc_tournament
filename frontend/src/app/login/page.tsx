@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { Crown, AlertCircle, ArrowRight, Lock, Mail, Loader2 } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect') || '/tournaments';
   const { user, loading, login } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -17,9 +19,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace('/tournaments');
+      router.replace(redirectTarget);
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, redirectTarget]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +29,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(email, password);
-      router.push('/tournaments');
+      router.push(redirectTarget);
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -120,7 +122,11 @@ export default function LoginPage() {
             <p className="text-xs text-slate-600 font-body">
               Don&apos;t have an account?{' '}
               <Link
-                href="/signup"
+                href={
+                  redirectTarget !== '/tournaments'
+                    ? `/signup?redirect=${encodeURIComponent(redirectTarget)}`
+                    : '/signup'
+                }
                 className="font-bold text-[#ea580c] hover:underline font-headline"
               >
                 Sign Up for free
@@ -130,5 +136,19 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[calc(100vh-5rem)] items-center justify-center p-4">
+          <Loader2 className="h-8 w-8 animate-spin text-[#ea580c]" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

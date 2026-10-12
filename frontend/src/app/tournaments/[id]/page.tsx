@@ -1052,102 +1052,104 @@ function TournamentDetailContent() {
       </div>
 
       {/* 2. Student Telemetry & Identity Banner (Stitch Spec) */}
-      <section className="relative w-full rounded-2xl bg-white border border-slate-200 p-4 sm:p-6 md:p-7 shadow-[0_4px_20px_rgba(12,35,64,0.04)] overflow-hidden">
-        {/* Ambient Top Gradient Accent Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#f97316] via-amber-400 to-[#0c2340]" />
+      {user && (
+        <section className="relative w-full rounded-2xl bg-white border border-slate-200 p-4 sm:p-6 md:p-7 shadow-[0_4px_20px_rgba(12,35,64,0.04)] overflow-hidden">
+          {/* Ambient Top Gradient Accent Bar */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#f97316] via-amber-400 to-[#0c2340]" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
-          {/* Identity Info with Official Student Avatar */}
-          <div className="flex items-center gap-4 sm:gap-5">
-            <div className="relative shrink-0">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#0c2340] to-slate-800 border-2 border-orange-200 overflow-hidden shadow-sm flex items-center justify-center text-white">
-                {avatarSrc ? (
-                  <img
-                    alt={user?.name || 'Competitor'}
-                    className="w-full h-full object-cover"
-                    src={avatarSrc}
-                  />
-                ) : (
-                  <span className="font-headline text-lg sm:text-2xl font-black text-amber-300 tracking-wider">
-                    {initials}
+          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+            {/* Identity Info with Official Student Avatar */}
+            <div className="flex items-center gap-4 sm:gap-5">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#0c2340] to-slate-800 border-2 border-orange-200 overflow-hidden shadow-sm flex items-center justify-center text-white">
+                  {avatarSrc ? (
+                    <img
+                      alt={user?.name || 'Competitor'}
+                      className="w-full h-full object-cover"
+                      src={avatarSrc}
+                    />
+                  ) : (
+                    <span className="font-headline text-lg sm:text-2xl font-black text-amber-300 tracking-wider">
+                      {initials}
+                    </span>
+                  )}
+                </div>
+                <span className="absolute -bottom-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-emerald-200">
+                  <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-500 animate-pulse" />
+                </span>
+              </div>
+
+              <div className="flex flex-col min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="font-headline text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0c2340] tracking-tight truncate">
+                    {user?.name || 'Competitor'}
+                  </h1>
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] sm:text-xs font-bold font-headline flex items-center gap-1 shadow-2xs">
+                    <Crown className="h-3.5 w-3.5 text-amber-500" />
+                    {studentStats?.title || 'Scholastic Candidate'}
                   </span>
-                )}
-              </div>
-              <span className="absolute -bottom-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-emerald-200">
-                <span className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-500 animate-pulse" />
-              </span>
-            </div>
-
-            <div className="flex flex-col min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="font-headline text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0c2340] tracking-tight truncate">
-                  {user?.name || 'Competitor'}
-                </h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] sm:text-xs font-bold font-headline flex items-center gap-1 shadow-2xs">
-                  <Crown className="h-3.5 w-3.5 text-amber-500" />
-                  {studentStats?.title || 'Scholastic Candidate'}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 flex flex-wrap items-center gap-2 mt-1">
-                <span className="font-medium text-slate-700">National Scholastic Circuit</span>
-                <span className="text-slate-300">•</span>
-                <span className="font-mono text-xs text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded">
-                  ID: #{user?.id ? `KC-${user.id.slice(0, 8).toUpperCase()}` : 'KC-SCHOLAR'}
-                </span>
-                <span className="text-slate-300">•</span>
-                <span className="text-xs text-[#f97316] font-semibold">Kingdom of Chess Academy</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Stats Strip */}
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full lg:w-auto">
-            {/* Rating Card */}
-            <div className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col min-w-[130px]">
-              <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider font-headline">
-                Rating (Blitz)
-              </span>
-              <div className="flex items-baseline gap-1.5 sm:gap-2 mt-0.5">
-                <span className="font-mono text-xl sm:text-2xl font-bold text-[#0c2340]">
-                  {studentStats?.rating ?? 1200}
-                </span>
-                <span
-                  className={`font-mono text-[11px] sm:text-xs font-bold px-1.5 py-0.5 rounded ${
-                    (studentStats?.ratingNet ?? 0) > 0
-                      ? 'text-emerald-700 bg-emerald-100/80 border border-emerald-200/60'
-                      : (studentStats?.ratingNet ?? 0) < 0
-                        ? 'text-red-700 bg-red-100/80 border border-red-200/60'
-                        : 'text-slate-500 bg-slate-200/60'
-                  }`}
-                >
-                  {studentStats?.completedGames
-                    ? studentStats.ratingNet > 0
-                      ? `+${studentStats.ratingNet} pts`
-                      : studentStats.ratingNet < 0
-                        ? `${studentStats.ratingNet} pts`
-                        : 'Even'
-                    : 'Provisional'}
-                </span>
+                </div>
+                <p className="text-xs text-slate-500 flex flex-wrap items-center gap-2 mt-1">
+                  <span className="font-medium text-slate-700">National Scholastic Circuit</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="font-mono text-xs text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded">
+                    ID: #{user?.id ? `KC-${user.id.slice(0, 8).toUpperCase()}` : 'KC-SCHOLAR'}
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-xs text-[#f97316] font-semibold">Kingdom of Chess Academy</span>
+                </p>
               </div>
             </div>
 
-            {/* Streak Card */}
-            <div className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col min-w-[120px]">
-              <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider font-headline">
-                Active Streak
-              </span>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <Flame className="h-5 w-5 text-[#f97316]" />
-                <span className="font-headline text-lg sm:text-xl font-extrabold text-[#0c2340]">
-                  {studentStats?.streak
-                    ? `${studentStats.streak} Win${studentStats.streak > 1 ? 's' : ''}`
-                    : '0 Wins'}
+            {/* Stats Strip */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full lg:w-auto">
+              {/* Rating Card */}
+              <div className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col min-w-[130px]">
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider font-headline">
+                  Rating (Blitz)
                 </span>
+                <div className="flex items-baseline gap-1.5 sm:gap-2 mt-0.5">
+                  <span className="font-mono text-xl sm:text-2xl font-bold text-[#0c2340]">
+                    {studentStats?.rating ?? 1200}
+                  </span>
+                  <span
+                    className={`font-mono text-[11px] sm:text-xs font-bold px-1.5 py-0.5 rounded ${
+                      (studentStats?.ratingNet ?? 0) > 0
+                        ? 'text-emerald-700 bg-emerald-100/80 border border-emerald-200/60'
+                        : (studentStats?.ratingNet ?? 0) < 0
+                          ? 'text-red-700 bg-red-100/80 border border-red-200/60'
+                          : 'text-slate-500 bg-slate-200/60'
+                    }`}
+                  >
+                    {studentStats?.completedGames
+                      ? studentStats.ratingNet > 0
+                        ? `+${studentStats.ratingNet} pts`
+                        : studentStats.ratingNet < 0
+                          ? `${studentStats.ratingNet} pts`
+                          : 'Even'
+                      : 'Provisional'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Streak Card */}
+              <div className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col min-w-[120px]">
+                <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider font-headline">
+                  Active Streak
+                </span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <Flame className="h-5 w-5 text-[#f97316]" />
+                  <span className="font-headline text-lg sm:text-xl font-extrabold text-[#0c2340]">
+                    {studentStats?.streak
+                      ? `${studentStats.streak} Win${studentStats.streak > 1 ? 's' : ''}`
+                      : '0 Wins'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Main 2-Column Layout (8 Col Left / 4 Col Sidebar on Desktop) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -1253,12 +1255,27 @@ function TournamentDetailContent() {
                       </p>
                     </div>
                     <button
-                      onClick={() => joinMutation.mutate()}
+                      onClick={() => {
+                        if (!user) {
+                          router.push(`/login?redirect=/tournaments/${id}`);
+                          return;
+                        }
+                        joinMutation.mutate();
+                      }}
                       disabled={joinMutation.isPending}
                       className="koc-btn-primary px-6 py-3 text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0 disabled:opacity-50"
                     >
-                      <CheckCircle className="h-4 w-4" />
-                      Register Now
+                      {joinMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Registering...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="h-4 w-4" />
+                          Register Now
+                        </>
+                      )}
                     </button>
                   </div>
                 ) : isQueuing ? (
@@ -1662,57 +1679,59 @@ function TournamentDetailContent() {
           </div>
 
           {/* 7. Current Standings Ribbon Card (Mobile / Desktop Telemetry) */}
-          <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-[0_4px_20px_rgba(12,35,64,0.04)] flex flex-col gap-3">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <Medal className="h-4 w-4 text-amber-500" />
-                  <span className="font-headline text-[11px] font-bold text-amber-600 uppercase tracking-wider">
-                    Your Performance
+          {user && isUserJoined && (
+            <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-[0_4px_20px_rgba(12,35,64,0.04)] flex flex-col gap-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <Medal className="h-4 w-4 text-amber-500" />
+                    <span className="font-headline text-[11px] font-bold text-amber-600 uppercase tracking-wider">
+                      Your Performance
+                    </span>
+                  </div>
+                  <span className="font-headline font-bold text-sm text-[#0c2340] block mt-0.5">
+                    Tournament Standing
                   </span>
                 </div>
-                <span className="font-headline font-bold text-sm text-[#0c2340] block mt-0.5">
-                  Tournament Standing
-                </span>
+                <div className="bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-xl text-right">
+                  <span className="font-headline font-bold text-[#f97316] text-base">
+                    #{userRank}
+                  </span>
+                  <span className="text-[10px] text-slate-500 block font-medium">
+                    of {tournament.participants?.length || 0}
+                  </span>
+                </div>
               </div>
-              <div className="bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-xl text-right">
-                <span className="font-headline font-bold text-[#f97316] text-base">
-                  #{userRank}
-                </span>
-                <span className="text-[10px] text-slate-500 block font-medium">
-                  of {tournament.participants?.length || 0}
-                </span>
-              </div>
-            </div>
 
-            {/* Quick Stats Pills */}
-            <div className="grid grid-cols-3 gap-2 mt-1">
-              <div className="bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-center">
-                <span className="block font-headline font-bold text-base text-emerald-700">
-                  {userWins}
-                </span>
-                <span className="block text-[11px] font-medium text-emerald-800">Wins</span>
+              {/* Quick Stats Pills */}
+              <div className="grid grid-cols-3 gap-2 mt-1">
+                <div className="bg-emerald-50 border border-emerald-100 p-2 rounded-xl text-center">
+                  <span className="block font-headline font-bold text-base text-emerald-700">
+                    {userWins}
+                  </span>
+                  <span className="block text-[11px] font-medium text-emerald-800">Wins</span>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 p-2 rounded-xl text-center">
+                  <span className="block font-headline font-bold text-base text-[#0c2340]">
+                    {userDraws}
+                  </span>
+                  <span className="block text-[11px] font-medium text-slate-500">Draws</span>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 p-2 rounded-xl text-center">
+                  <span className="block font-headline font-bold text-base text-slate-400">
+                    {userLosses}
+                  </span>
+                  <span className="block text-[11px] font-medium text-slate-500">Losses</span>
+                </div>
               </div>
-              <div className="bg-slate-50 border border-slate-200 p-2 rounded-xl text-center">
-                <span className="block font-headline font-bold text-base text-[#0c2340]">
-                  {userDraws}
-                </span>
-                <span className="block text-[11px] font-medium text-slate-500">Draws</span>
-              </div>
-              <div className="bg-slate-50 border border-slate-200 p-2 rounded-xl text-center">
-                <span className="block font-headline font-bold text-base text-slate-400">
-                  {userLosses}
-                </span>
-                <span className="block text-[11px] font-medium text-slate-500">Losses</span>
-              </div>
-            </div>
 
-            {/* Telemetry Details */}
-            <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-              <span>Points: <strong className="text-[#f97316] font-bold">{userScore} pts</strong></span>
-              <span>Clock: <strong className="text-[#0c2340] font-bold">{tournament.timeControl}</strong></span>
+              {/* Telemetry Details */}
+              <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+                <span>Points: <strong className="text-[#f97316] font-bold">{userScore} pts</strong></span>
+                <span>Clock: <strong className="text-[#0c2340] font-bold">{tournament.timeControl}</strong></span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
