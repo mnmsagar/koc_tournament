@@ -70,23 +70,25 @@ function TournamentDetailContent() {
     try {
       const start = new Date(startDateString);
       if (isNaN(start.getTime())) return 'Season 2026';
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const formatDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 
       const formatTime = (d: Date) => {
         let h = d.getHours();
-        const m = d.getMinutes().toString().padStart(2, '0');
+        const m = pad(d.getMinutes());
         const ampm = h >= 12 ? 'PM' : 'AM';
         h = h % 12 || 12;
-        return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
+        return `${pad(h)}:${m} ${ampm}`;
       };
 
       if (!endDateString) {
-        return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} • ${formatTime(start)}`;
+        return `${formatDate(start)} • ${formatTime(start)}`;
       }
 
       const end = new Date(endDateString);
       if (isNaN(end.getTime())) {
-        return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} • ${formatTime(start)}`;
+        return `${formatDate(start)} • ${formatTime(start)}`;
       }
 
       const isSameDay =
@@ -95,14 +97,10 @@ function TournamentDetailContent() {
         start.getDate() === end.getDate();
 
       if (isSameDay) {
-        return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} • ${formatTime(start)} – ${formatTime(end)}`;
+        return `${formatDate(start)} • ${formatTime(start)} – ${formatTime(end)}`;
       }
 
-      if (start.getFullYear() === end.getFullYear()) {
-        return `${start.getDate()} ${months[start.getMonth()]} – ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
-      }
-
-      return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} – ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
+      return `${formatDate(start)} – ${formatDate(end)}`;
     } catch {
       return 'Season 2026';
     }
@@ -1179,9 +1177,9 @@ function TournamentDetailContent() {
               </div>
               <div className="flex items-center gap-3 self-start sm:self-auto">
                 <div className="text-right hidden sm:block">
-                  <div className="text-xs font-medium text-slate-400 font-headline">Field Size</div>
+                  <div className="text-xs font-medium text-slate-400 font-headline">Players</div>
                   <div className="font-mono text-sm font-bold text-[#0c2340]">
-                    {tournament.participants?.length || 0} Competitors
+                    {tournament.participants?.length || 0}
                   </div>
                 </div>
                 <div className="h-8 w-px bg-slate-200 hidden sm:block" />

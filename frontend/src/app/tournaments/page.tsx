@@ -176,29 +176,31 @@ export default function TournamentsPage() {
     return toDatetimeLocal(base);
   };
 
-  // Deterministic clean schedule formatting helper (handles single date, same-day range, and multi-day range)
+  // Platform-wide standard schedule formatting helper (DD/MM/YYYY per PRD specification)
   const formatTournamentSchedule = (startDateString?: string, endDateString?: string) => {
     if (!startDateString) return 'Season 2026';
     try {
       const start = new Date(startDateString);
       if (isNaN(start.getTime())) return 'Season 2026';
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const formatDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 
       const formatTime = (d: Date) => {
         let h = d.getHours();
-        const m = d.getMinutes().toString().padStart(2, '0');
+        const m = pad(d.getMinutes());
         const ampm = h >= 12 ? 'PM' : 'AM';
         h = h % 12 || 12;
-        return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
+        return `${pad(h)}:${m} ${ampm}`;
       };
 
       if (!endDateString) {
-        return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} • ${formatTime(start)}`;
+        return `${formatDate(start)} • ${formatTime(start)}`;
       }
 
       const end = new Date(endDateString);
       if (isNaN(end.getTime())) {
-        return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} • ${formatTime(start)}`;
+        return `${formatDate(start)} • ${formatTime(start)}`;
       }
 
       const isSameDay =
@@ -207,14 +209,10 @@ export default function TournamentsPage() {
         start.getDate() === end.getDate();
 
       if (isSameDay) {
-        return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} • ${formatTime(start)} – ${formatTime(end)}`;
+        return `${formatDate(start)} • ${formatTime(start)} – ${formatTime(end)}`;
       }
 
-      if (start.getFullYear() === end.getFullYear()) {
-        return `${start.getDate()} ${months[start.getMonth()]} – ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
-      }
-
-      return `${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} – ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
+      return `${formatDate(start)} – ${formatDate(end)}`;
     } catch {
       return 'Season 2026';
     }
@@ -442,31 +440,38 @@ export default function TournamentsPage() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredTournaments.map((t) => {
           const isCompleted = t.status === 'completed';
+          const isEnrolled = t.isJoined && user?.role === 'student';
           return (
             <div
               key={t.id}
-              className="koc-card group flex flex-col justify-between rounded-2xl p-6 transition duration-200 hover:-translate-y-1 hover:shadow-md border border-slate-200 bg-white relative overflow-hidden"
+              className={`koc-card group flex flex-col justify-between rounded-2xl p-6 transition duration-200 hover:-translate-y-1 hover:shadow-md border bg-white relative overflow-hidden ${
+                isEnrolled
+                  ? 'border-emerald-300 ring-1 ring-emerald-500/20 shadow-xs'
+                  : 'border-slate-200'
+              }`}
             >
               {/* Top Accent Strip */}
               <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${
                 isCompleted
                   ? 'from-purple-500 via-indigo-500 to-slate-400'
-                  : 'from-[#ea580c] via-amber-400 to-[#0c2340]'
+                  : isEnrolled
+                    ? 'from-emerald-500 via-teal-400 to-[#0c2340]'
+                    : 'from-[#ea580c] via-amber-400 to-[#0c2340]'
               }`} />
 
               {/* Top Row: Badge + Time Control */}
               <div>
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className="mb-4 flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {getStatusBadge(t.status)}
-                    {t.isJoined && user?.role === 'student' && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/90 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 font-headline">
-                        <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                    {isEnrolled && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[10px] sm:text-[11px] font-extrabold font-headline shadow-xs tracking-wider uppercase">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-200 shrink-0" />
                         Enrolled
                       </span>
                     )}
                   </div>
-                  <span className="flex items-center gap-1.5 rounded-lg bg-orange-50 border border-orange-200/80 px-2.5 py-1 text-xs font-mono font-bold text-[#ea580c]">
+                  <span className="flex items-center gap-1.5 rounded-lg bg-orange-50 border border-orange-200/80 px-2.5 py-1 text-xs font-mono font-bold text-[#ea580c] shrink-0">
                     <Timer className="h-3.5 w-3.5 text-[#ea580c]" />
                     {t.timeControl} Rapid
                   </span>
@@ -486,10 +491,10 @@ export default function TournamentsPage() {
                   <div className="flex items-center justify-between text-slate-600">
                     <span className="flex items-center gap-1.5 text-slate-500">
                       <Users className="h-3.5 w-3.5 text-emerald-600" />
-                      Field Size:
+                      Players:
                     </span>
-                    <span className="font-bold text-[#0c2340]">
-                      {t.participantCount || 0} Registered Competitors
+                    <span className="font-bold text-[#0c2340] font-mono text-sm">
+                      {t.participantCount || 0}
                     </span>
                   </div>
 
