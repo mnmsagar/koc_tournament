@@ -34,3 +34,6 @@ scratch/
 stitch_responsive_ui_design_system/
 stitch*/
 
+# AI helper files
+CLAUDE.md
+
