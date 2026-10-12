@@ -37,7 +37,7 @@ export default function TournamentsPage() {
   const [newStartDate, setNewStartDate] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
   const [createError, setCreateError] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'completed'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'enrolled' | 'completed'>('all');
   const [joiningTournamentId, setJoiningTournamentId] = useState<string | null>(null);
 
   // Fetch tournaments
@@ -71,6 +71,9 @@ export default function TournamentsPage() {
     if (filterStatus === 'all') return relevantTournaments;
     if (filterStatus === 'open') {
       return relevantTournaments.filter((t) => t.status === 'open' || t.status === 'ongoing');
+    }
+    if (filterStatus === 'enrolled') {
+      return relevantTournaments.filter((t) => t.isJoined);
     }
     if (filterStatus === 'completed') {
       return relevantTournaments.filter((t) => t.status === 'completed');
@@ -366,7 +369,7 @@ export default function TournamentsPage() {
 
       {/* Filter Tabs */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setFilterStatus('all')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition font-headline ${
@@ -387,6 +390,19 @@ export default function TournamentsPage() {
           >
             Open & Live ({relevantTournaments.filter((t) => t.status === 'open' || t.status === 'ongoing').length})
           </button>
+          {user?.role === 'student' && (
+            <button
+              onClick={() => setFilterStatus('enrolled')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition font-headline flex items-center gap-1.5 ${
+                filterStatus === 'enrolled'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Enrolled ({relevantTournaments.filter((t) => t.isJoined).length})
+            </button>
+          )}
           <button
             onClick={() => setFilterStatus('completed')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition font-headline ${
@@ -426,12 +442,16 @@ export default function TournamentsPage() {
           <h3 className="font-headline text-xl font-bold text-[#0c2340]">
             {user?.role === 'coach'
               ? 'No hosted tournaments match this filter'
-              : 'No tournaments match this filter'}
+              : filterStatus === 'enrolled'
+                ? 'You are not enrolled in any tournaments yet'
+                : 'No tournaments match this filter'}
           </h3>
           <p className="text-sm text-slate-500 mt-2 max-w-sm mx-auto font-body">
             {user?.role === 'coach'
               ? 'You haven\'t hosted any tournaments matching this filter. Click "Host New Tournament" above to start an event.'
-              : 'Switch filters or wait for a coach to host the next tournament round.'}
+              : filterStatus === 'enrolled'
+                ? 'Browse open tournaments under "Open & Live" and click "Register Now" to participate.'
+                : 'Switch filters or wait for a coach to host the next tournament round.'}
           </p>
         </div>
       )}
